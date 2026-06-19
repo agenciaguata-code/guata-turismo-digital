@@ -1,22 +1,19 @@
 import { Link } from "@tanstack/react-router";
-import logo from "@/assets/guata-logo.png";
+import logoAsset from "@/assets/guata-capacita-logo.png.asset.json";
 
 export function SiteFooter() {
   return (
     <footer className="mt-20 border-t border-border bg-secondary/40">
       <div className="container-narrow grid gap-8 py-12 md:grid-cols-3">
         <div>
-          <div className="flex items-center gap-2.5">
-            <img src={logo} alt="" className="h-10 w-10 rounded-lg" />
-            <div>
-              <div className="font-display text-lg font-semibold">
-                Guatá <span className="text-primary">Capacita</span>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Capacitando pessoas para transformar o turismo.
-              </div>
-            </div>
-          </div>
+          <img
+            src={logoAsset.url}
+            alt="Guatá Capacita"
+            className="h-14 w-auto object-contain"
+          />
+          <p className="mt-3 max-w-xs text-sm text-muted-foreground">
+            Capacitando pessoas para transformar o turismo.
+          </p>
         </div>
         <div>
           <h3 className="mb-3 text-sm font-semibold">Navegue</h3>

@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import logo from "@/assets/guata-logo.png";
+import logoAsset from "@/assets/guata-capacita-logo.png.asset.json";
+const logo = logoAsset.url;
 
 const searchSchema = z.object({
   tab: z.enum(["signin", "signup", "forgot"]).optional(),
@@ -47,8 +48,10 @@ function AuthPage() {
           <ArrowLeft className="h-4 w-4" /> Voltar ao site
         </Link>
         <div>
-          <img src={logo} alt="" className="h-16 w-16" />
-          <h1 className="mt-5 font-display text-4xl leading-tight">
+          <div className="rounded-2xl bg-background/95 p-4 inline-block shadow-elevated">
+            <img src={logo} alt="Guatá Capacita" className="h-24 w-auto object-contain" />
+          </div>
+          <h1 className="mt-6 font-display text-4xl leading-tight">
             Sua trilha de capacitação em turismo começa aqui.
           </h1>
           <p className="mt-4 max-w-md text-primary-foreground/85">
@@ -65,7 +68,7 @@ function AuthPage() {
             <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground">
               <ArrowLeft className="h-4 w-4" /> Início
             </Link>
-            <img src={logo} alt="" className="h-9 w-9" />
+            <img src={logo} alt="Guatá Capacita" className="h-10 w-auto object-contain" />
           </div>
 
           <h2 className="font-display text-3xl">

@@ -13,7 +13,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import hero from "@/assets/hero-forest.jpg";
-import logo from "@/assets/guata-logo.png";
+import logoAsset from "@/assets/guata-capacita-logo.png.asset.json";
+const logo = logoAsset.url;
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -100,11 +101,10 @@ function Hero() {
         <div className="relative mx-auto w-full max-w-md">
           <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-primary/15 via-accent/10 to-transparent blur-2xl" />
           <div className="surface-card relative overflow-hidden p-6 sm:p-8">
-            <div className="flex items-center gap-3">
-              <img src={logo} alt="Mascote Guatá" className="h-16 w-16" />
-              <div>
-                <div className="font-display text-xl font-semibold">Guatá, seu guia</div>
-                <div className="text-xs text-muted-foreground">Bem-vindo à trilha!</div>
+            <div className="flex flex-col items-center text-center">
+              <img src={logo} alt="Mascote Guatá Capacita" className="h-40 w-auto object-contain" />
+              <div className="mt-3 text-sm text-muted-foreground">
+                Bem-vindo à trilha! Eu sou o Guatá, seu guia.
               </div>
             </div>
             <div className="mt-5 space-y-3">
