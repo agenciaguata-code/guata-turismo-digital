@@ -15,7 +15,10 @@ import { Route as CursosRouteImport } from './routes/cursos'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CursosSlugRouteImport } from './routes/cursos.$slug'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedMeusCursosRouteImport } from './routes/_authenticated/meus-cursos'
+import { Route as AuthenticatedAprenderSlugLessonIdRouteImport } from './routes/_authenticated/aprender.$slug.$lessonId'
 
 const ValidarRoute = ValidarRouteImport.update({
   id: '/validar',
@@ -46,37 +49,62 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CursosSlugRoute = CursosSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CursosRoute,
+} as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMeusCursosRoute = AuthenticatedMeusCursosRouteImport.update({
+  id: '/meus-cursos',
+  path: '/meus-cursos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAprenderSlugLessonIdRoute =
+  AuthenticatedAprenderSlugLessonIdRouteImport.update({
+    id: '/aprender/$slug/$lessonId',
+    path: '/aprender/$slug/$lessonId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/cursos': typeof CursosRoute
+  '/cursos': typeof CursosRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/validar': typeof ValidarRoute
+  '/meus-cursos': typeof AuthenticatedMeusCursosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/cursos/$slug': typeof CursosSlugRoute
+  '/aprender/$slug/$lessonId': typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/cursos': typeof CursosRoute
+  '/cursos': typeof CursosRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/validar': typeof ValidarRoute
+  '/meus-cursos': typeof AuthenticatedMeusCursosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/cursos/$slug': typeof CursosSlugRoute
+  '/aprender/$slug/$lessonId': typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/cursos': typeof CursosRoute
+  '/cursos': typeof CursosRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/validar': typeof ValidarRoute
+  '/_authenticated/meus-cursos': typeof AuthenticatedMeusCursosRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/cursos/$slug': typeof CursosSlugRoute
+  '/_authenticated/aprender/$slug/$lessonId': typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -86,9 +114,21 @@ export interface FileRouteTypes {
     | '/cursos'
     | '/reset-password'
     | '/validar'
+    | '/meus-cursos'
     | '/perfil'
+    | '/cursos/$slug'
+    | '/aprender/$slug/$lessonId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/cursos' | '/reset-password' | '/validar' | '/perfil'
+  to:
+    | '/'
+    | '/auth'
+    | '/cursos'
+    | '/reset-password'
+    | '/validar'
+    | '/meus-cursos'
+    | '/perfil'
+    | '/cursos/$slug'
+    | '/aprender/$slug/$lessonId'
   id:
     | '__root__'
     | '/'
@@ -97,14 +137,17 @@ export interface FileRouteTypes {
     | '/cursos'
     | '/reset-password'
     | '/validar'
+    | '/_authenticated/meus-cursos'
     | '/_authenticated/perfil'
+    | '/cursos/$slug'
+    | '/_authenticated/aprender/$slug/$lessonId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  CursosRoute: typeof CursosRoute
+  CursosRoute: typeof CursosRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   ValidarRoute: typeof ValidarRoute
 }
@@ -153,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cursos/$slug': {
+      id: '/cursos/$slug'
+      path: '/$slug'
+      fullPath: '/cursos/$slug'
+      preLoaderRoute: typeof CursosSlugRouteImport
+      parentRoute: typeof CursosRoute
+    }
     '/_authenticated/perfil': {
       id: '/_authenticated/perfil'
       path: '/perfil'
@@ -160,25 +210,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPerfilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/meus-cursos': {
+      id: '/_authenticated/meus-cursos'
+      path: '/meus-cursos'
+      fullPath: '/meus-cursos'
+      preLoaderRoute: typeof AuthenticatedMeusCursosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/aprender/$slug/$lessonId': {
+      id: '/_authenticated/aprender/$slug/$lessonId'
+      path: '/aprender/$slug/$lessonId'
+      fullPath: '/aprender/$slug/$lessonId'
+      preLoaderRoute: typeof AuthenticatedAprenderSlugLessonIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMeusCursosRoute: typeof AuthenticatedMeusCursosRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedAprenderSlugLessonIdRoute: typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMeusCursosRoute: AuthenticatedMeusCursosRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedAprenderSlugLessonIdRoute:
+    AuthenticatedAprenderSlugLessonIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface CursosRouteChildren {
+  CursosSlugRoute: typeof CursosSlugRoute
+}
+
+const CursosRouteChildren: CursosRouteChildren = {
+  CursosSlugRoute: CursosSlugRoute,
+}
+
+const CursosRouteWithChildren =
+  CursosRoute._addFileChildren(CursosRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  CursosRoute: CursosRoute,
+  CursosRoute: CursosRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   ValidarRoute: ValidarRoute,
 }

@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logo from "@/assets/guata-logo.png";
+import logoAsset from "@/assets/guata-capacita-logo.png.asset.json";
+const logo = logoAsset.url;
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -60,7 +61,7 @@ function ResetPasswordPage() {
           <ArrowLeft className="h-4 w-4" /> Início
         </Link>
         <div className="surface-card p-7">
-          <img src={logo} alt="" className="h-12 w-12" />
+          <img src={logo} alt="Guatá Capacita" className="h-14 w-auto object-contain" />
           <h1 className="mt-3 font-display text-2xl">Definir nova senha</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Escolha uma senha forte e fácil de lembrar.

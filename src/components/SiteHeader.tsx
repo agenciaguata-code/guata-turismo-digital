@@ -1,10 +1,10 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
+import { Menu, X, LogOut, User as UserIcon, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/guata-logo.png";
+import logoAsset from "@/assets/guata-capacita-logo.png.asset.json";
 
 export function SiteHeader() {
   const navigate = useNavigate();
@@ -27,32 +27,24 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="container-narrow flex h-16 items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src={logo} alt="" className="h-9 w-9 rounded-lg" />
-          <div className="flex flex-col leading-none">
-            <span className="font-display text-lg font-semibold text-foreground">
-              Guatá <span className="text-primary">Capacita</span>
-            </span>
-            <span className="hidden text-[10px] uppercase tracking-wider text-muted-foreground sm:block">
-              Capacitação em turismo
-            </span>
-          </div>
+        <Link to="/" className="flex items-center gap-2" aria-label="Guatá Capacita — início">
+          <img
+            src={logoAsset.url}
+            alt="Guatá Capacita"
+            className="h-11 w-auto object-contain"
+            width={120}
+            height={44}
+          />
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
           <Link to="/" className="text-sm font-medium text-foreground/80 hover:text-primary">
             Início
           </Link>
-          <Link
-            to="/cursos"
-            className="text-sm font-medium text-foreground/80 hover:text-primary"
-          >
+          <Link to="/cursos" className="text-sm font-medium text-foreground/80 hover:text-primary">
             Cursos
           </Link>
-          <Link
-            to="/validar"
-            className="text-sm font-medium text-foreground/80 hover:text-primary"
-          >
+          <Link to="/validar" className="text-sm font-medium text-foreground/80 hover:text-primary">
             Validar certificado
           </Link>
         </nav>
@@ -60,6 +52,11 @@ export function SiteHeader() {
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/meus-cursos">
+                  <BookOpen className="mr-1.5 h-4 w-4" /> Meus cursos
+                </Link>
+              </Button>
               <Button asChild variant="ghost" size="sm">
                 <Link to="/perfil">
                   <UserIcon className="mr-1.5 h-4 w-4" /> Perfil
@@ -107,6 +104,11 @@ export function SiteHeader() {
             <div className="mt-2 flex flex-col gap-2 border-t border-border pt-3">
               {user ? (
                 <>
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/meus-cursos" onClick={() => setOpen(false)}>
+                      <BookOpen className="mr-1.5 h-4 w-4" /> Meus cursos
+                    </Link>
+                  </Button>
                   <Button asChild variant="outline" size="sm">
                     <Link to="/perfil" onClick={() => setOpen(false)}>
                       <UserIcon className="mr-1.5 h-4 w-4" /> Perfil
