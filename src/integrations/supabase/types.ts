@@ -678,6 +678,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      validate_certificate: {
+        Args: { _code: string }
+        Returns: {
+          code: string
+          course_title: string
+          hours: number
+          issued_at: string
+          student_name: string
+        }[]
+      }
     }
     Enums: {
       app_role: "aluno" | "professor" | "admin"
