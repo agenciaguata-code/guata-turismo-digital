@@ -36,14 +36,11 @@ function ValidatePage() {
     const trimmed = code.trim();
     if (!trimmed) return toast.error("Informe o código do certificado");
     setLoading(true);
-    const { data, error } = await supabase
-      .from("certificates")
-      .select("code,hours,issued_at,student_name,course_title")
-      .eq("code", trimmed)
-      .maybeSingle();
+    const { data, error } = await supabase.rpc("validate_certificate", { _code: trimmed });
     setLoading(false);
     if (error) return toast.error(error.message);
-    setResult(data ?? "not_found");
+    const row = Array.isArray(data) ? data[0] : data;
+    setResult(row ?? "not_found");
   }
 
   return (
