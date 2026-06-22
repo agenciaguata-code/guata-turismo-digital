@@ -62,6 +62,11 @@ export function SiteHeader() {
                   <UserIcon className="mr-1.5 h-4 w-4" /> Perfil
                 </Link>
               </Button>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/trocar-senha">
+                  <KeyRound className="mr-1.5 h-4 w-4" /> Senha
+                </Link>
+              </Button>
               <Button onClick={handleSignOut} variant="outline" size="sm">
                 <LogOut className="mr-1.5 h-4 w-4" /> Sair
               </Button>
