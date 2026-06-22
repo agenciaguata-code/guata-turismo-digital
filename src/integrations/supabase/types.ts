@@ -481,6 +481,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          must_change_password: boolean
           phone: string | null
           state: string | null
           updated_at: string
@@ -492,6 +493,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id: string
+          must_change_password?: boolean
           phone?: string | null
           state?: string | null
           updated_at?: string
@@ -503,6 +505,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          must_change_password?: boolean
           phone?: string | null
           state?: string | null
           updated_at?: string

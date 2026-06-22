@@ -16,8 +16,10 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CursosSlugRouteImport } from './routes/cursos.$slug'
+import { Route as AuthenticatedTrocarSenhaRouteImport } from './routes/_authenticated/trocar-senha'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedMeusCursosRouteImport } from './routes/_authenticated/meus-cursos'
+import { Route as ApiPublicSetupAdminRouteImport } from './routes/api/public/setup-admin'
 import { Route as AuthenticatedAprenderSlugLessonIdRouteImport } from './routes/_authenticated/aprender.$slug.$lessonId'
 
 const ValidarRoute = ValidarRouteImport.update({
@@ -54,6 +56,12 @@ const CursosSlugRoute = CursosSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CursosRoute,
 } as any)
+const AuthenticatedTrocarSenhaRoute =
+  AuthenticatedTrocarSenhaRouteImport.update({
+    id: '/trocar-senha',
+    path: '/trocar-senha',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -63,6 +71,11 @@ const AuthenticatedMeusCursosRoute = AuthenticatedMeusCursosRouteImport.update({
   id: '/meus-cursos',
   path: '/meus-cursos',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicSetupAdminRoute = ApiPublicSetupAdminRouteImport.update({
+  id: '/api/public/setup-admin',
+  path: '/api/public/setup-admin',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAprenderSlugLessonIdRoute =
   AuthenticatedAprenderSlugLessonIdRouteImport.update({
@@ -79,7 +92,9 @@ export interface FileRoutesByFullPath {
   '/validar': typeof ValidarRoute
   '/meus-cursos': typeof AuthenticatedMeusCursosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/trocar-senha': typeof AuthenticatedTrocarSenhaRoute
   '/cursos/$slug': typeof CursosSlugRoute
+  '/api/public/setup-admin': typeof ApiPublicSetupAdminRoute
   '/aprender/$slug/$lessonId': typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 export interface FileRoutesByTo {
@@ -90,7 +105,9 @@ export interface FileRoutesByTo {
   '/validar': typeof ValidarRoute
   '/meus-cursos': typeof AuthenticatedMeusCursosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/trocar-senha': typeof AuthenticatedTrocarSenhaRoute
   '/cursos/$slug': typeof CursosSlugRoute
+  '/api/public/setup-admin': typeof ApiPublicSetupAdminRoute
   '/aprender/$slug/$lessonId': typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 export interface FileRoutesById {
@@ -103,7 +120,9 @@ export interface FileRoutesById {
   '/validar': typeof ValidarRoute
   '/_authenticated/meus-cursos': typeof AuthenticatedMeusCursosRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/trocar-senha': typeof AuthenticatedTrocarSenhaRoute
   '/cursos/$slug': typeof CursosSlugRoute
+  '/api/public/setup-admin': typeof ApiPublicSetupAdminRoute
   '/_authenticated/aprender/$slug/$lessonId': typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 export interface FileRouteTypes {
@@ -116,7 +135,9 @@ export interface FileRouteTypes {
     | '/validar'
     | '/meus-cursos'
     | '/perfil'
+    | '/trocar-senha'
     | '/cursos/$slug'
+    | '/api/public/setup-admin'
     | '/aprender/$slug/$lessonId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,7 +148,9 @@ export interface FileRouteTypes {
     | '/validar'
     | '/meus-cursos'
     | '/perfil'
+    | '/trocar-senha'
     | '/cursos/$slug'
+    | '/api/public/setup-admin'
     | '/aprender/$slug/$lessonId'
   id:
     | '__root__'
@@ -139,7 +162,9 @@ export interface FileRouteTypes {
     | '/validar'
     | '/_authenticated/meus-cursos'
     | '/_authenticated/perfil'
+    | '/_authenticated/trocar-senha'
     | '/cursos/$slug'
+    | '/api/public/setup-admin'
     | '/_authenticated/aprender/$slug/$lessonId'
   fileRoutesById: FileRoutesById
 }
@@ -150,6 +175,7 @@ export interface RootRouteChildren {
   CursosRoute: typeof CursosRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   ValidarRoute: typeof ValidarRoute
+  ApiPublicSetupAdminRoute: typeof ApiPublicSetupAdminRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -203,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CursosSlugRouteImport
       parentRoute: typeof CursosRoute
     }
+    '/_authenticated/trocar-senha': {
+      id: '/_authenticated/trocar-senha'
+      path: '/trocar-senha'
+      fullPath: '/trocar-senha'
+      preLoaderRoute: typeof AuthenticatedTrocarSenhaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/perfil': {
       id: '/_authenticated/perfil'
       path: '/perfil'
@@ -217,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMeusCursosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/setup-admin': {
+      id: '/api/public/setup-admin'
+      path: '/api/public/setup-admin'
+      fullPath: '/api/public/setup-admin'
+      preLoaderRoute: typeof ApiPublicSetupAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/aprender/$slug/$lessonId': {
       id: '/_authenticated/aprender/$slug/$lessonId'
       path: '/aprender/$slug/$lessonId'
@@ -230,12 +270,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMeusCursosRoute: typeof AuthenticatedMeusCursosRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedTrocarSenhaRoute: typeof AuthenticatedTrocarSenhaRoute
   AuthenticatedAprenderSlugLessonIdRoute: typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMeusCursosRoute: AuthenticatedMeusCursosRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedTrocarSenhaRoute: AuthenticatedTrocarSenhaRoute,
   AuthenticatedAprenderSlugLessonIdRoute:
     AuthenticatedAprenderSlugLessonIdRoute,
 }
@@ -261,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   CursosRoute: CursosRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   ValidarRoute: ValidarRoute,
+  ApiPublicSetupAdminRoute: ApiPublicSetupAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
