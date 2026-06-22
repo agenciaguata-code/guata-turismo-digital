@@ -19,7 +19,6 @@ import { Route as CursosSlugRouteImport } from './routes/cursos.$slug'
 import { Route as AuthenticatedTrocarSenhaRouteImport } from './routes/_authenticated/trocar-senha'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedMeusCursosRouteImport } from './routes/_authenticated/meus-cursos'
-import { Route as ApiPublicSetupAdminRouteImport } from './routes/api/public/setup-admin'
 import { Route as AuthenticatedAprenderSlugLessonIdRouteImport } from './routes/_authenticated/aprender.$slug.$lessonId'
 
 const ValidarRoute = ValidarRouteImport.update({
@@ -72,11 +71,6 @@ const AuthenticatedMeusCursosRoute = AuthenticatedMeusCursosRouteImport.update({
   path: '/meus-cursos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ApiPublicSetupAdminRoute = ApiPublicSetupAdminRouteImport.update({
-  id: '/api/public/setup-admin',
-  path: '/api/public/setup-admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedAprenderSlugLessonIdRoute =
   AuthenticatedAprenderSlugLessonIdRouteImport.update({
     id: '/aprender/$slug/$lessonId',
@@ -94,7 +88,6 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/trocar-senha': typeof AuthenticatedTrocarSenhaRoute
   '/cursos/$slug': typeof CursosSlugRoute
-  '/api/public/setup-admin': typeof ApiPublicSetupAdminRoute
   '/aprender/$slug/$lessonId': typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 export interface FileRoutesByTo {
@@ -107,7 +100,6 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/trocar-senha': typeof AuthenticatedTrocarSenhaRoute
   '/cursos/$slug': typeof CursosSlugRoute
-  '/api/public/setup-admin': typeof ApiPublicSetupAdminRoute
   '/aprender/$slug/$lessonId': typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 export interface FileRoutesById {
@@ -122,7 +114,6 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/trocar-senha': typeof AuthenticatedTrocarSenhaRoute
   '/cursos/$slug': typeof CursosSlugRoute
-  '/api/public/setup-admin': typeof ApiPublicSetupAdminRoute
   '/_authenticated/aprender/$slug/$lessonId': typeof AuthenticatedAprenderSlugLessonIdRoute
 }
 export interface FileRouteTypes {
@@ -137,7 +128,6 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/trocar-senha'
     | '/cursos/$slug'
-    | '/api/public/setup-admin'
     | '/aprender/$slug/$lessonId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -150,7 +140,6 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/trocar-senha'
     | '/cursos/$slug'
-    | '/api/public/setup-admin'
     | '/aprender/$slug/$lessonId'
   id:
     | '__root__'
@@ -164,7 +153,6 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/trocar-senha'
     | '/cursos/$slug'
-    | '/api/public/setup-admin'
     | '/_authenticated/aprender/$slug/$lessonId'
   fileRoutesById: FileRoutesById
 }
@@ -175,7 +163,6 @@ export interface RootRouteChildren {
   CursosRoute: typeof CursosRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   ValidarRoute: typeof ValidarRoute
-  ApiPublicSetupAdminRoute: typeof ApiPublicSetupAdminRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -250,13 +237,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMeusCursosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/setup-admin': {
-      id: '/api/public/setup-admin'
-      path: '/api/public/setup-admin'
-      fullPath: '/api/public/setup-admin'
-      preLoaderRoute: typeof ApiPublicSetupAdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/aprender/$slug/$lessonId': {
       id: '/_authenticated/aprender/$slug/$lessonId'
       path: '/aprender/$slug/$lessonId'
@@ -303,7 +283,6 @@ const rootRouteChildren: RootRouteChildren = {
   CursosRoute: CursosRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   ValidarRoute: ValidarRoute,
-  ApiPublicSetupAdminRoute: ApiPublicSetupAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
