@@ -95,7 +95,7 @@ function ProfilePage() {
       phone: fd.get("phone"),
       city: fd.get("city"),
       state: fd.get("state"),
-      avatar_url: fd.get("avatar_url"),
+      avatar_url: profile.avatar_url ?? "",
     });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
 
@@ -108,7 +108,6 @@ function ProfilePage() {
         phone: parsed.data.phone || null,
         city: parsed.data.city || null,
         state: parsed.data.state || null,
-        avatar_url: parsed.data.avatar_url || null,
       })
       .eq("id", profile.id);
     setSaving(false);
