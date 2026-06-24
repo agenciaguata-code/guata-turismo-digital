@@ -57,6 +57,13 @@ export function SiteHeader() {
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <>
+              {isAdmin && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/admin">
+                    <Shield className="mr-1.5 h-4 w-4" /> Admin
+                  </Link>
+                </Button>
+              )}
               <Button asChild variant="ghost" size="sm">
                 <Link to="/meus-cursos">
                   <BookOpen className="mr-1.5 h-4 w-4" /> Meus cursos
