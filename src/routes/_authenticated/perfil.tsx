@@ -160,6 +160,29 @@ function ProfilePage() {
                 <div className="font-display text-lg">{profile.full_name || "Sem nome"}</div>
                 <div className="text-xs text-muted-foreground">{email}</div>
               </div>
+              <label className="mt-3 block w-full">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) onAvatarFile(f);
+                    e.currentTarget.value = "";
+                  }}
+                />
+                <span className="inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-muted">
+                  {uploadingAvatar ? (
+                    <>
+                      <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="mr-1.5 h-4 w-4" /> Trocar foto
+                    </>
+                  )}
+                </span>
+              </label>
             </div>
 
             {/* Form */}
