@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2, User as UserIcon } from "lucide-react";
+import { Loader2, User as UserIcon, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { uploadAndSignUrl } from "@/lib/storage";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -44,9 +45,29 @@ const profileSchema = z.object({
 function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState<string>("");
   const [roles, setRoles] = useState<string[]>([]);
+
+  async function onAvatarFile(file: File) {
+    if (!profile) return;
+    if (file.size > 3 * 1024 * 1024) return toast.error("Imagem maior que 3MB");
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${profile.id}/avatar-${Date.now()}.${ext}`;
+      const { url } = await uploadAndSignUrl("avatars", path, file);
+      const { error } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", profile.id);
+      if (error) throw error;
+      setProfile({ ...profile, avatar_url: url });
+      toast.success("Foto atualizada!");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha no upload");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -74,7 +95,7 @@ function ProfilePage() {
       phone: fd.get("phone"),
       city: fd.get("city"),
       state: fd.get("state"),
-      avatar_url: fd.get("avatar_url"),
+      avatar_url: profile.avatar_url ?? "",
     });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
 
@@ -87,7 +108,6 @@ function ProfilePage() {
         phone: parsed.data.phone || null,
         city: parsed.data.city || null,
         state: parsed.data.state || null,
-        avatar_url: parsed.data.avatar_url || null,
       })
       .eq("id", profile.id);
     setSaving(false);
@@ -139,6 +159,29 @@ function ProfilePage() {
                 <div className="font-display text-lg">{profile.full_name || "Sem nome"}</div>
                 <div className="text-xs text-muted-foreground">{email}</div>
               </div>
+              <label className="mt-3 block w-full">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) onAvatarFile(f);
+                    e.currentTarget.value = "";
+                  }}
+                />
+                <span className="inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-muted">
+                  {uploadingAvatar ? (
+                    <>
+                      <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="mr-1.5 h-4 w-4" /> Trocar foto
+                    </>
+                  )}
+                </span>
+              </label>
             </div>
 
             {/* Form */}
@@ -149,7 +192,7 @@ function ProfilePage() {
                 <FormField label="Cidade" id="city" defaultValue={profile.city ?? ""} />
                 <FormField label="Estado (UF)" id="state" defaultValue={profile.state ?? ""} />
               </div>
-              <FormField label="URL do avatar" id="avatar_url" defaultValue={profile.avatar_url ?? ""} placeholder="https://..." />
+              {/* avatar managed by upload button on the left */}
               <div className="space-y-1.5">
                 <Label htmlFor="bio">Biografia</Label>
                 <Textarea

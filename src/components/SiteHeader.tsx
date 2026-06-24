@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, LogOut, User as UserIcon, BookOpen, KeyRound } from "lucide-react";
+import { Menu, X, LogOut, User as UserIcon, BookOpen, KeyRound, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
@@ -9,13 +9,18 @@ import logoAsset from "@/assets/guata-capacita-logo.png.asset.json";
 export function SiteHeader() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) =>
-      setUser(session?.user ?? null),
-    );
+    async function load(u: User | null) {
+      setUser(u);
+      if (!u) return setIsAdmin(false);
+      const { data } = await supabase.rpc("has_role", { _user_id: u.id, _role: "admin" });
+      setIsAdmin(Boolean(data));
+    }
+    supabase.auth.getUser().then(({ data }) => load(data.user));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => load(session?.user ?? null));
     return () => sub.subscription.unsubscribe();
   }, []);
 
@@ -52,6 +57,13 @@ export function SiteHeader() {
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <>
+              {isAdmin && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/admin">
+                    <Shield className="mr-1.5 h-4 w-4" /> Admin
+                  </Link>
+                </Button>
+              )}
               <Button asChild variant="ghost" size="sm">
                 <Link to="/meus-cursos">
                   <BookOpen className="mr-1.5 h-4 w-4" /> Meus cursos
