@@ -193,7 +193,7 @@ function ProfilePage() {
                 <FormField label="Cidade" id="city" defaultValue={profile.city ?? ""} />
                 <FormField label="Estado (UF)" id="state" defaultValue={profile.state ?? ""} />
               </div>
-              <FormField label="URL do avatar" id="avatar_url" defaultValue={profile.avatar_url ?? ""} placeholder="https://..." />
+              {/* avatar managed by upload button on the left */}
               <div className="space-y-1.5">
                 <Label htmlFor="bio">Biografia</Label>
                 <Textarea
