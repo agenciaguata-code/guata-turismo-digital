@@ -9,13 +9,18 @@ import logoAsset from "@/assets/guata-capacita-logo.png.asset.json";
 export function SiteHeader() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) =>
-      setUser(session?.user ?? null),
-    );
+    async function load(u: User | null) {
+      setUser(u);
+      if (!u) return setIsAdmin(false);
+      const { data } = await supabase.rpc("has_role", { _user_id: u.id, _role: "admin" });
+      setIsAdmin(Boolean(data));
+    }
+    supabase.auth.getUser().then(({ data }) => load(data.user));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => load(session?.user ?? null));
     return () => sub.subscription.unsubscribe();
   }, []);
 
