@@ -45,9 +45,29 @@ const profileSchema = z.object({
 function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState<string>("");
   const [roles, setRoles] = useState<string[]>([]);
+
+  async function onAvatarFile(file: File) {
+    if (!profile) return;
+    if (file.size > 3 * 1024 * 1024) return toast.error("Imagem maior que 3MB");
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${profile.id}/avatar-${Date.now()}.${ext}`;
+      const { url } = await uploadAndSignUrl("avatars", path, file);
+      const { error } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", profile.id);
+      if (error) throw error;
+      setProfile({ ...profile, avatar_url: url });
+      toast.success("Foto atualizada!");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha no upload");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
 
   useEffect(() => {
     (async () => {
