@@ -1,66 +1,60 @@
+## Estado atual (já implementado nas rodadas anteriores)
 
-# Diagnóstico: o que existe x o que falta
+Antes de planejar correções, é importante que você saiba o que **já existe** no app — porque a percepção "não foi desenvolvido" não bate com o código:
 
-## O que JÁ está pronto
-- **Banco de dados completo**: tabelas `courses`, `modules`, `lessons`, `materials`, `quizzes`, `quiz_questions`, `assignments`, `enrollments`, `certificates`, `profiles`, `user_roles` — todas com RLS e políticas que permitem `admin`/`professor` gerenciarem conteúdo.
-- **Autenticação e papéis**: login, troca de senha obrigatória, papel `admin` atribuído ao seu e-mail.
-- **Área pública**: home, catálogo `/cursos`, detalhe `/cursos/:slug`, validação de certificado.
-- **Área do aluno**: `/meus-cursos`, player `/aprender/:slug/:lessonId`, perfil.
+- **Painel admin completo** em `/admin`:
+  - `/admin` — dashboard com estatísticas
+  - `/admin/cursos` — listagem com busca/filtros, publicar/despublicar, excluir
+  - `/admin/cursos/novo` — criação de curso
+  - `/admin/cursos/:id` — editor completo com 3 abas: **Detalhes** (incl. upload de capa), **Módulos & aulas** (CRUD + reordenação), **Materiais** (upload de PDFs)
+  - `/admin/alunos` — promover usuários a admin/professor
+  - `/admin/matriculas` — matricular alunos manualmente
+  - Link "Admin" no header (só aparece pra admin) — você confirmou que vê
+- **Storage**: os 3 buckets existem (`course-covers`, `lesson-materials`, `avatars`), todos privados, com políticas RLS corretas (uso de URLs assinadas de 10 anos via `src/lib/storage.ts`)
+- **Upload de avatar** em `/perfil` já está plugado
 
-## O que NÃO existe (origem dos bugs que você viu)
-1. **Nenhuma tela de administração** — não há rotas tipo `/admin/cursos`, `/admin/cursos/novo`, edição de módulos/aulas. Por isso "editar/criar curso não dá": a UI nunca foi construída.
-2. **Nenhum bucket de Storage** — daí o erro **"Bucket not found"** ao trocar a foto de capa. Precisamos criar o bucket `course-covers` (público) e `lesson-materials` (privado) com políticas RLS.
-3. **Sem gestão de matrículas/alunos** pelo admin.
-4. **Sem upload de avatar** no perfil (também depende de bucket).
+Ou seja, criar/editar cursos **deveria funcionar**. Se não está funcionando, é bug, não falta de implementação.
 
----
+## O problema real a investigar
 
-# Plano de desenvolvimento (proposto)
+Você diz "não faz upload da imagem" e ainda não testou em `/admin`. Os buckets e políticas existem — então "Bucket not found" como mensagem literal não condiz com o estado atual do banco. Suspeitas mais prováveis, em ordem:
 
-Dividido em 4 fases entregáveis. Posso fazer tudo de uma vez ou parar a cada fase para você validar — me diga sua preferência.
+1. **Preview com build quebrado/desatualizado** — a sessão de hoje começou com um Vite error overlay; é possível que você esteja vendo uma versão anterior em cache.
+2. **Toast genérico "Bucket not found"** porque o cliente não acha o bucket pela política RLS (caso o usuário não esteja autenticado no momento do upload, ou o token de sessão esteja expirado).
+3. **Bug pontual no path/owner check** que só ativa em certo cenário.
 
-## Fase 1 — Infraestrutura de arquivos (rápido, destrava upload)
-- Criar bucket **`course-covers`** (público) — capas de curso.
-- Criar bucket **`lesson-materials`** (privado) — PDFs, slides etc.
-- Criar bucket **`avatars`** (público) — foto de perfil.
-- Políticas RLS em `storage.objects`: admin/professor podem escrever; leitura conforme o bucket.
+## Plano de ação (curto, sem grandes reescritas)
 
-## Fase 2 — Painel admin de Cursos
-- Rota protegida `_authenticated/admin/` com guard verificando `has_role('admin')`.
-- `/admin/cursos` — listagem com filtros (publicado/rascunho, categoria), busca.
-- `/admin/cursos/novo` e `/admin/cursos/:id/editar` — formulário com:
-  - título, slug (auto), descrição curta/longa, categoria, nível, duração, preço, publicado (sim/não), instrutor.
-  - upload da capa direto no bucket `course-covers`.
-- Ações: duplicar, despublicar, excluir (com confirmação).
-- Link "Admin" no menu do header (visível só para admin).
+```text
+1. Diagnóstico assistido (sem mudar regras)
+2. Correção pontual do(s) bug(s) encontrado(s)
+3. Pequenas melhorias de UX no admin (se você quiser)
+```
 
-## Fase 3 — Módulos, Aulas e Materiais
-- Dentro de `/admin/cursos/:id/editar`, abas:
-  - **Módulos**: criar/editar/reordenar (drag-and-drop) — campos título, descrição, ordem.
-  - **Aulas** (por módulo): título, descrição, conteúdo, vídeo (provider + URL), duração, preview gratuita, ordem.
-  - **Materiais**: upload para `lesson-materials`, tipo (pdf/slide/etc), tamanho, vínculo a curso ou aula.
+### Fase 1 — Diagnóstico (30 min, código mínimo)
+- Adicionar logs detalhados em `uploadAndSignUrl` (qual bucket, qual path, código de erro real do Supabase) e mostrar a mensagem do Supabase no toast em vez de só "Falha no upload".
+- Testar 3 fluxos com você acompanhando:
+  - `/perfil` → trocar foto
+  - `/admin/cursos/novo` → criar curso de teste
+  - `/admin/cursos/:id` → trocar capa do curso de teste
+- Coletar a mensagem **exata** do Supabase (ex.: `new row violates row-level security`, `Bucket not found`, `JWT expired`).
 
-## Fase 4 — Alunos, matrículas e dashboard admin
-- `/admin` — dashboard: total de alunos, cursos publicados, matrículas ativas, certificados emitidos.
-- `/admin/alunos` — lista de usuários, papel, matrículas, ação de promover a professor/admin.
-- `/admin/matriculas` — matricular/desmatricular manualmente.
-- (Opcional) `/admin/certificados` — emitir manualmente.
+### Fase 2 — Correção (depende do diagnóstico)
+Possíveis correções, escolhidas conforme o que a Fase 1 mostrar:
+- Ajustar política RLS do bucket envolvido.
+- Ajustar o formato do `path` (prefixo de pasta) para casar com a política.
+- Garantir que a sessão Supabase está válida antes do upload (refresh forçado).
+- Forçar refresh do preview / limpar cache se for um build velho.
 
----
+### Fase 3 — Polimento opcional do admin (você decide)
+Só se quiser, dá pra acrescentar:
+- Drag-and-drop real nos módulos/aulas (hoje é botão ↑/↓).
+- Preview da capa antes de salvar.
+- Filtro por categoria/nível na listagem de cursos.
+- Atalho "Editar" direto do card do curso na home/catálogo (admin only).
 
-# Detalhes técnicos (referência rápida)
+## O que eu preciso de você antes de começar
 
-- **Stack**: TanStack Start + server functions (`createServerFn` com `requireSupabaseAuth` + check de `has_role`).
-- **Uploads**: via `supabase.storage.from('course-covers').upload(...)` no client; URL pública gravada em `courses.cover_url`.
-- **Validação**: Zod nos formulários.
-- **UI**: shadcn (Form, Dialog, Table, Tabs, DragHandle via `@dnd-kit`).
-- **Tipos**: regenerados após cada migration.
-
----
-
-# Perguntas antes de começar
-
-1. **Posso começar pela Fase 1 (buckets) agora?** Sem isso, qualquer upload continua quebrado.
-2. **Quer todas as 4 fases nesta rodada**, ou prefere validar fase a fase?
-3. **Quer que `professor` também consiga gerenciar cursos** no painel, ou só `admin`?
-4. **Fase 4 (dashboard/alunos/matrículas) entra agora** ou pode ficar para uma segunda iteração?
+1. Confirme se posso seguir com a **Fase 1 (logs de diagnóstico)** — é uma alteração mínima e segura.
+2. Quando eu liberar a Fase 1, **abra `/perfil`, tente trocar a foto, e cole aqui a mensagem que aparecer no toast** (será a mensagem real do Supabase, não mais "Falha no upload"). Faça o mesmo em `/admin/cursos/novo` criando um curso "Teste" e tentando subir uma capa.
+3. Diga se quer também a Fase 3 (polimento) agora ou só depois do bug resolvido.
