@@ -21,7 +21,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 type Course = Database["public"]["Tables"]["courses"]["Row"];
 
-export const Route = createFileRoute("/_authenticated/admin/cursos")({
+export const Route = createFileRoute("/_authenticated/admin/cursos/")({
   head: () => ({ meta: [{ title: "Admin · Cursos" }, { name: "robots", content: "noindex" }] }),
   component: CoursesAdmin,
 });
